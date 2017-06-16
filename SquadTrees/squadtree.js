@@ -1,5 +1,5 @@
 /*
-input:
+example input:
 
 4 4
 1011
@@ -42,10 +42,50 @@ function main(input) {
 		
 		var path = "", lvl = 0, numOfCols = dims[0];
 		quadtree(img, map, sRow, sCol, path, lvl, numOfCols);
+		quicksort(map);
+		compress(map);
+
+
 	}
 };
 
+/*
+	Recursively builds a quadtree from the img (2d array of binary integers) by inserting elements 
+	into the map (an array of objects) iff every integer in the quadrant is the same.
+	Map will contain the quadtree representation where
+	each element will be an object composed of: 1) a binary string, 2) a path to each quadrant,
+	and the level (base 4) of the object within the tree.
+	
+	For example: 
 
+	img: 
+
+	1011
+	0111
+	1010
+	0111
+	
+	map:
+	[
+	{ binStr: 1001001000100011, lvl: 0, path: 0},
+	{ binStr: 1001, lvl: 1, path: 00},
+	{ binStr: 1111, lvl: 1, path: 01},
+	{ binStr: 1001, lvl: 1, path: 02},
+	{ binStr: 1011, lvl: 1, path: 03},
+	{ binStr: 1, lvl: 2, path: 000},
+	{ binStr: 0, lvl: 2, path: 001},
+	{ binStr: 0, lvl: 2, path: 002},
+	{ binStr: 1, lvl: 2, path: 003},
+	{ binStr: 1, lvl: 2, path: 020},
+	{ binStr: 0, lvl: 2, path: 021},
+	{ binStr: 0, lvl: 2, path: 022},
+	{ binStr: 1, lvl: 2, path: 023},
+	{ binStr: 1, lvl: 2, path: 030},
+	{ binStr: 0, lvl: 2, path: 031},
+	{ binStr: 1, lvl: 2, path: 032},
+	{ binStr: 1, lvl: 2, path: 033}
+	]
+*/
 function quadtree(img, map, sRow, sCol, path, lvl, numOfCols) {
 
 	var isSame = 1;
@@ -60,7 +100,6 @@ function quadtree(img, map, sRow, sCol, path, lvl, numOfCols) {
 			}
 		}
 	}
-
 
 	if(isSame) {
 		var elCount = map.length;
@@ -86,10 +125,9 @@ function quadtree(img, map, sRow, sCol, path, lvl, numOfCols) {
 Finds the next power of 2 of a given integer. If the integer is already a power of 2,
 it simply returns the integer.
 
-@param arr - the number
-@param comparator - the function to compare objects against
+@param num - the number
 */
-function powerOf2(arr, ) {
+function powerOf2(num ) {
 	var i = 0;
 	var base = 2;
 	while(true) {
@@ -101,6 +139,95 @@ function powerOf2(arr, ) {
 		i++;
 	}
 }
+
+/*
+
+Compresses the quadtree by removing duplicate elements.
+
+It does so by comparing the binary strings of each object
+on the same lvl for strings whose length is greater than 1.
+
+If the strings match, the object (arbitrarily selected) whose
+path is furthest left is removed along with all its sub quadrants 
+who have the same path prefix. 
+
+I.e
+
+map before compression:
+	[
+	{ binStr: 1001001000100011, lvl: 0, path: 0},
+	{ binStr: 1001, lvl: 1, path: 00},
+	{ binStr: 1111, lvl: 1, path: 01},
+	{ binStr: 1001, lvl: 1, path: 02},
+	{ binStr: 1011, lvl: 1, path: 03},
+	{ binStr: 1, lvl: 2, path: 000},
+	{ binStr: 0, lvl: 2, path: 001},
+	{ binStr: 0, lvl: 2, path: 002},
+	{ binStr: 1, lvl: 2, path: 003},
+	{ binStr: 1, lvl: 2, path: 020},
+	{ binStr: 0, lvl: 2, path: 021},
+	{ binStr: 0, lvl: 2, path: 022},
+	{ binStr: 1, lvl: 2, path: 023},
+	{ binStr: 1, lvl: 2, path: 030},
+	{ binStr: 0, lvl: 2, path: 031},
+	{ binStr: 1, lvl: 2, path: 032},
+	{ binStr: 1, lvl: 2, path: 033}
+	]
+
+map after compression:
+	[
+	{ binStr: 1001001000100011, lvl: 0, path: 0},
+	{ binStr: 1001, lvl: 1, path: 00},
+	{ binStr: 1111, lvl: 1, path: 01},
+	{ binStr: 1011, lvl: 1, path: 03},
+	{ binStr: 1, lvl: 2, path: 000},
+	{ binStr: 0, lvl: 2, path: 001},
+	{ binStr: 0, lvl: 2, path: 002},
+	{ binStr: 1, lvl: 2, path: 003},
+	{ binStr: 1, lvl: 2, path: 030},
+	{ binStr: 0, lvl: 2, path: 031},
+	{ binStr: 1, lvl: 2, path: 032},
+	{ binStr: 1, lvl: 2, path: 033}
+	]
+
+Map is assumed to be sorted on binStr.
+Such that binStrings that are equal will be next to each other.
+*/
+
+
+function compress(map) {
+
+	for(var i = 0; i < map.length() -1 ; i++) {
+
+		if(map[i].binStr.localCompare(map[i + 1].binStr) == 0) {
+
+			var path = map[i].path;
+			var len = path.length;
+			for(var j = 0; j < map.length - 1; j++) {
+
+				if(map[j].path.substring(0,len)) {
+
+				}
+
+			}
+
+
+		}
+	}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 main("4 4\n1011\n0111\n1010\n0111\n6 7\n1110111\n1010101\n0000000\n0100010\n1011101\n1010101\n0 0");
 
