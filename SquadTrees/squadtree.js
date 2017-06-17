@@ -138,7 +138,6 @@ function powerOf2(num ) {
 }
 
 /*
-
 Compresses the quadtree by removing duplicate elements.
 
 It does so by comparing the binary strings of each object
@@ -189,67 +188,45 @@ map after compression:
 
 */
 
-
 function compress(map) {
 
 	var pathsToRemove = [];
-
 	for(var i = 0; i < map.length -1 ; i++) {
-
 		var el = map[i];
-
 		var len = el.path.length;
-
 		var ignore = false;
-
 		for(var obj : pathsToRemove) {
 
 			if(obj.path.substring(0,len) == el.path) {
 				ignore = true;
 			}
 		}
-
 		if(ignore || len == 1) {
 			continue;
 		}
-
 		var els = map.filter(function(obj) {
-
 			return obj.lvl == el.lvl && !(Object.is(obj, el)) && !(el.checkedNodes.contains(obj));
-
 		});
-
 		for (var j = 0 ; j < els.length; j++) {
-
 			if(el.binStr.localCompare(els[j].binStr)) {
 				pathsToRemove.push(els[j].path);
 			}
-
 			el.checkedNodes.push(els[j]);
 			els[j].checkedNodes.push(el);
-
 		}
 	}
-
 	removeNodes(pathsToRemove, map);
-
 }
-
-
 
 function removeNodes(paths, map) {
 
 	for(var path : paths) {
-
 		for(var i = 0 ; i < map.length; i++) {
-
 			if(map[i].path.substring(0, path.length) == path) {
 				map.splice(i, 1);
 			}
-
 		}
 	}
-
 }
 
 main("4 4\n1011\n0111\n1010\n0111\n6 7\n1110111\n1010101\n0000000\n0100010\n1011101\n1010101\n0 0");
