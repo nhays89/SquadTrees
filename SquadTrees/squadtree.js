@@ -6,15 +6,11 @@ example input:
 0111
 1010
 0111
-6 7
-1110111
-1010101
-0000000
-0100010
-1011101
-1010101
 0 0
 
+example output:
+
+17 12
 
 */
 
@@ -42,9 +38,9 @@ function main(input) {
 		
 		var path = "", lvl = 0, numOfCols = dims[0];
 		quadtree(img, map, sRow, sCol, path, lvl, numOfCols);
-		quicksort(map);
+		var orig = map.length;
 		compress(map);
-
+		console.log(orig + " " + map.length);
 
 	}
 };
@@ -198,70 +194,63 @@ function compress(map) {
 
 	var pathsToRemove = [];
 
-		for(var i = 0; i < map.length -1 ; i++) {
+	for(var i = 0; i < map.length -1 ; i++) {
 
-			var el = map[i];
+		var el = map[i];
 
-			var len = el.path.length;
+		var len = el.path.length;
 
-			var ignore = false;
+		var ignore = false;
 
-			for(var obj : pathsToRemove) {
+		for(var obj : pathsToRemove) {
 
-				if(obj.path.substring(0,len).contains(el.path)) {
-					ignore = true;
-				}
+			if(obj.path.substring(0,len) == el.path) {
+				ignore = true;
+			}
+		}
+
+		if(ignore || len == 1) {
+			continue;
+		}
+
+		var els = map.filter(function(obj) {
+
+			return obj.lvl == el.lvl && !(Object.is(obj, el)) && !(el.checkedNodes.contains(obj));
+
+		});
+
+		for (var j = 0 ; j < els.length; j++) {
+
+			if(el.binStr.localCompare(els[j].binStr)) {
+				pathsToRemove.push(els[j].path);
 			}
 
-			if(ignore || len == 1) {
-				continue;
+			el.checkedNodes.push(els[j]);
+			els[j].checkedNodes.push(el);
+
+		}
+	}
+
+	removeNodes(pathsToRemove, map);
+
+}
+
+
+
+function removeNodes(paths, map) {
+
+	for(var path : paths) {
+
+		for(var i = 0 ; i < map.length; i++) {
+
+			if(map[i].path.substring(0, path.length) == path) {
+				map.splice(i, 1);
 			}
 
-			var els = map.filter(function(obj) {
-
-				return obj.lvl == el.lvl && !(Object.is(obj, el)) && !(el.checkedNodes.contains(obj));
-
-			});
-
-			for (var j = 0 ; j < els.length; j++) {
-
-				if(el.binStr.localCompare(els[j].binStr)) {
-					pathsToRemove.push(els[j].path);
-				}
-
-				el.checkedNodes.push(els[j]);
-				els[j].checkedNodes.push(el);
-
-			}
 		}
 	}
 
 }
-
-
-
-
-function quicksort(map) {
-
-	//given an array of objects
-
-	//sort on binStr
-
-
-	var pivot = Math.random() * map.length;
-
-
-
-
-
-
-
-}
-
-
-
-
-
 
 main("4 4\n1011\n0111\n1010\n0111\n6 7\n1110111\n1010101\n0000000\n0100010\n1011101\n1010101\n0 0");
 
