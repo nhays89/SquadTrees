@@ -107,7 +107,8 @@ function quadtree(img, map, sRow, sCol, path, lvl, numOfCols) {
 		{
 			binStr : binStr,
 			path : path,
-			lvl : lvl
+			lvl : lvl,
+			checkedNodes : []
 		}; 
 		return;
 	} else {
@@ -190,39 +191,72 @@ map after compression:
 	{ binStr: 1, lvl: 2, path: 033}
 	]
 
-Map is assumed to be sorted on binStr.
-Such that binStrings that are equal will be next to each other.
 */
 
 
 function compress(map) {
 
-	for(var i = 0; i < map.length() -1 ; i++) {
+	var pathsToRemove = [];
 
-		if(map[i].binStr.localCompare(map[i + 1].binStr) == 0) {
+		for(var i = 0; i < map.length -1 ; i++) {
 
-			var path = map[i].path;
-			var len = path.length;
-			for(var j = 0; j < map.length - 1; j++) {
+			var el = map[i];
 
-				if(map[j].path.substring(0,len)) {
+			var len = el.path.length;
 
+			var ignore = false;
+
+			for(var obj : pathsToRemove) {
+
+				if(obj.path.substring(0,len).contains(el.path)) {
+					ignore = true;
 				}
-
 			}
 
+			if(ignore || len == 1) {
+				continue;
+			}
 
+			var els = map.filter(function(obj) {
+
+				return obj.lvl == el.lvl && !(Object.is(obj, el)) && !(el.checkedNodes.contains(obj));
+
+			});
+
+			for (var j = 0 ; j < els.length; j++) {
+
+				if(el.binStr.localCompare(els[j].binStr)) {
+					pathsToRemove.push(els[j].path);
+				}
+
+				el.checkedNodes.push(els[j]);
+				els[j].checkedNodes.push(el);
+
+			}
 		}
 	}
-
 
 }
 
 
 
 
+function quicksort(map) {
+
+	//given an array of objects
+
+	//sort on binStr
 
 
+	var pivot = Math.random() * map.length;
+
+
+
+
+
+
+
+}
 
 
 
